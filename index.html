@@ -215,10 +215,38 @@ body.ready .frame svg{ opacity:.5; }
 #seal .core-b{ height:50%; display:flex; flex-direction:column; align-items:center;
                justify-content:flex-start; gap:11px;
                padding-top:clamp(20px,4.4svh,38px); }
-#seal .medallion{ width:clamp(84px,22vw,118px); height:auto;
-  filter:drop-shadow(0 0 22px rgba(201,162,39,.45));
-  animation:spin 44s linear infinite; }
-@keyframes spin{ to{ transform:rotate(360deg) } }
+/* The seal opens on the same arch that frames the names. Each half draws itself
+   from its foot up to the apex; when they meet the niche lights, the star lands,
+   and a glint runs the outline. Nothing rotates. */
+.sealarch{ width:clamp(88px,24vw,124px); height:auto;
+           filter:drop-shadow(0 0 16px rgba(201,162,39,.3)); }
+.sealarch.lit{ animation:arch-breathe 7s ease-in-out 3.2s infinite; }
+@keyframes arch-breathe{
+  0%,100%{ filter:drop-shadow(0 0 14px rgba(201,162,39,.26)) }
+  50%    { filter:drop-shadow(0 0 26px rgba(201,162,39,.5)) }
+}
+.sealarch .dr{ transition:stroke-dashoffset 1.3s var(--ease); }
+.sealarch .dr.o{ transition-delay:.28s; }
+.sealarch .dr.i{ transition-delay:.84s; transition-duration:1.45s; }
+
+.sealarch .glow{ opacity:0; transition:opacity 1.1s var(--ease) 1.65s; }
+.sealarch.lit .glow{ opacity:1; }
+
+.sealarch .apex{ opacity:0; transform:scale(.25); transform-origin:72px 14px;
+  transition:opacity .5s var(--ease) 1.9s,
+             transform .78s cubic-bezier(.34,1.7,.5,1) 1.9s; }
+.sealarch.lit .apex{ opacity:1; transform:scale(1); }
+
+.sealarch .glint{ opacity:0; }
+.sealarch.lit .glint{ animation:glint-run 5.2s ease-in-out 2.5s infinite; }
+.sealarch.lit .glint.g2{ animation-delay:2.68s; }
+@keyframes glint-run{
+  0%   { stroke-dashoffset:var(--L); opacity:0 }
+  6%   { opacity:.9 }
+  40%  { opacity:.9 }
+  52%  { stroke-dashoffset:0; opacity:0 }
+  100% { stroke-dashoffset:0; opacity:0 }
+}
 #seal .s-name{
   font-family:'Cinzel',serif; font-size:clamp(17px,5.4vw,26px);
   letter-spacing:.3em; text-indent:.3em; color:#fffaf0;
@@ -478,7 +506,43 @@ body.ready .cue.show{ opacity:1; }
   <div class="panel b"></div>
   <div class="core">
     <div class="core-t">
-      <svg class="medallion" viewBox="-34 -34 68 68" aria-hidden="true"><circle r="27.00" fill="#04231a" opacity=".5"/><circle r="27.00" fill="none" stroke="#d9b449" stroke-width="1.35"/><circle r="24.30" fill="none" stroke="#d9b449" stroke-width="0.59" opacity=".55"/><g fill="none" stroke="#f7ecc4" stroke-width="1.24" stroke-linejoin="round"><path d="M0.00,-21.06L21.06,0.00L0.00,21.06L-21.06,0.00Z"/><path d="M14.89,-14.89L14.89,14.89L-14.89,14.89L-14.89,-14.89Z"/></g><path d="M5.68,-13.72L13.72,-5.68L13.72,5.68L5.68,13.72L-5.68,13.72L-13.72,5.68L-13.72,-5.68L-5.68,-13.72Z" fill="none" stroke="#d9b449" stroke-width="0.81" opacity=".9"/><path d="M0.00,-8.10L1.29,-3.12L5.73,-5.73L3.12,-1.29L8.10,0.00L3.12,1.29L5.73,5.73L1.29,3.12L0.00,8.10L-1.29,3.12L-5.73,5.73L-3.12,1.29L-8.10,0.00L-3.12,-1.29L-5.73,-5.73L-1.29,-3.12Z" fill="#f7ecc4"/><circle r="1.94" fill="#04231a"/></svg>
+      <svg class="sealarch" viewBox="0 0 144 200" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="sfoil" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#a8821c"/><stop offset=".35" stop-color="#e8cf86"/>
+      <stop offset=".6" stop-color="#f7ecc4"/><stop offset="1" stop-color="#c9a227"/>
+    </linearGradient>
+    <radialGradient id="sglow" cx=".5" cy=".42" r=".62">
+      <stop offset="0" stop-color="#6fe3b4" stop-opacity=".5"/>
+      <stop offset=".5" stop-color="#1b8a66" stop-opacity=".26"/>
+      <stop offset="1" stop-color="#04231a" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="sclip"><path d="M24.00,111.00A17.05 17.05 0 0 0 27.26,85.77A17.05 17.05 0 0 0 36.83,62.19A17.05 17.05 0 0 0 52.08,41.82A17.05 17.05 0 0 0 72.00,26.00A17.05 17.05 0 0 0 91.92,41.82A17.05 17.05 0 0 0 107.17,62.19A17.05 17.05 0 0 0 116.74,85.77A17.05 17.05 0 0 0 120.00,111.00L120.00,188.00L24.00,188.00Z"/></clipPath>
+    <filter id="sblur" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2.4"/></filter>
+    <linearGradient id="sfade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".72" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <mask id="sfoot"><rect width="144" height="200" fill="url(#sfade)"/></mask>
+  </defs>
+  <g mask="url(#sfoot)">
+    <g clip-path="url(#sclip)">
+      <rect class="glow" width="144" height="200" fill="url(#sglow)"/>
+    </g>
+    <path class="dr o" d="M16.00,188.00L16.00,116.00A120.89 120.89 0 0 1 72.00,14.00"  stroke="url(#sfoil)" stroke-width="2.1" stroke-linecap="round"/>
+    <path class="dr o" d="M128.00,188.00L128.00,116.00A120.89 120.89 0 0 0 72.00,14.00" stroke="url(#sfoil)" stroke-width="2.1" stroke-linecap="round"/>
+    <path class="dr i" d="M24.00,188.00L24.00,111.00A17.05 17.05 0 0 0 27.26,85.77A17.05 17.05 0 0 0 36.83,62.19A17.05 17.05 0 0 0 52.08,41.82A17.05 17.05 0 0 0 72.00,26.00"  stroke="#f0dc9c" stroke-width="1.25" stroke-linecap="round"/>
+    <path class="dr i" d="M120.00,188.00L120.00,111.00A17.05 17.05 0 0 1 116.74,85.77A17.05 17.05 0 0 1 107.17,62.19A17.05 17.05 0 0 1 91.92,41.82A17.05 17.05 0 0 1 72.00,26.00"  stroke="#f0dc9c" stroke-width="1.25" stroke-linecap="round"/>
+    <path class="glint" d="M16.00,188.00L16.00,116.00A120.89 120.89 0 0 1 72.00,14.00" stroke="#fffdf2" stroke-width="2.6"
+          stroke-linecap="round" filter="url(#sblur)"/>
+    <path class="glint g2" d="M128.00,188.00L128.00,116.00A120.89 120.89 0 0 0 72.00,14.00" stroke="#fffdf2" stroke-width="2.6"
+          stroke-linecap="round" filter="url(#sblur)"/>
+  </g>
+  <g class="apex">
+    <path d="M72.00,5.60L73.30,10.86L77.94,8.06L75.14,12.70L80.40,14.00L75.14,15.30L77.94,19.94L73.30,17.14L72.00,22.40L70.70,17.14L66.06,19.94L68.86,15.30L63.60,14.00L68.86,12.70L66.06,8.06L70.70,10.86Z" fill="#f7ecc4"/>
+    <path d="M72.00,10.40L72.57,12.61L74.55,11.45L73.39,13.43L75.60,14.00L73.39,14.57L74.55,16.55L72.57,15.39L72.00,17.60L71.43,15.39L69.45,16.55L70.61,14.57L68.40,14.00L70.61,13.43L69.45,11.45L71.43,12.61Z" fill="#06301f"/>
+  </g>
+</svg>
     </div>
     <div class="core-b">
     <div class="s-name">SADIKUL &nbsp;&amp;&nbsp; NIMISA</div>
@@ -648,6 +712,27 @@ body.ready .cue.show{ opacity:1; }
     box.innerHTML = html;
   })();
 
+  /* ── the seal's arch draws itself, foot to apex ───────────── */
+  (function(){
+    var sa = $(".sealarch");
+    if (!sa) return;
+    $$(".dr", sa).forEach(function(p){
+      var L = p.getTotalLength();
+      p.style.strokeDasharray = L;
+      p.style.strokeDashoffset = RM ? 0 : L;
+    });
+    $$(".glint", sa).forEach(function(p){
+      var L = p.getTotalLength();
+      p.style.setProperty("--L", L);
+      p.style.strokeDasharray = "15 " + L;
+      p.style.strokeDashoffset = L;
+    });
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      sa.classList.add("lit");
+      $$(".dr", sa).forEach(function(p){ p.style.strokeDashoffset = 0; });
+    });});
+  })();
+
   /* ── the seal ─────────────────────────────────────────────── */
   var seal = $("#seal"), scroller = $("#scroller"), chapters = $$(".ch");
   function openSeal(){
@@ -785,7 +870,7 @@ body.ready .cue.show{ opacity:1; }
       "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//walima//invitation//EN","CALSCALE:GREGORIAN",
       "BEGIN:VEVENT",
       "UID:walima-20261013-sadikul-nimisa@invitation",
-      "DTSTAMP:20261005T130856Z",
+      "DTSTAMP:20261005T131906Z",
       "DTSTART:20261013T073000Z",
       "DTEND:20261013T113000Z",
       "SUMMARY:Sadikul & Nimisa — Walima Reception",
