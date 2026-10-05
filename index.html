@@ -149,6 +149,30 @@ a{ text-decoration:none; color:inherit; }
   background:radial-gradient(120% 86% at 50% 50%, rgba(4,35,26,0) 42%, rgba(2,17,12,.86) 100%); }
 @keyframes drift{ to{ transform:translate(72px,72px); } }
 
+/* a large khatam turning slowly behind everything, against the girih drift */
+.bg .med{
+  position:absolute; left:50%; top:50%; width:min(148vmin,1040px); height:auto;
+  transform:translate(-50%,-50%); opacity:.055;
+  animation:spin-slow 190s linear infinite;
+}
+@keyframes spin-slow{ to{ transform:translate(-50%,-50%) rotate(-360deg); } }
+
+/* gold brackets framing the viewport, echoing the printed card's rule */
+.frame{ position:fixed; inset:0; z-index:30; pointer-events:none; }
+.frame span{ position:absolute; line-height:0; }
+.frame svg{
+  display:block; width:clamp(30px,7.5vw,56px); height:auto;
+  opacity:0; transition:opacity 1.3s var(--ease) .55s;
+}
+body.ready .frame svg{ opacity:.5; }
+.frame .tl{ top:max(13px,env(safe-area-inset-top)); left:max(13px,env(safe-area-inset-left)); }
+.frame .tr{ top:max(13px,env(safe-area-inset-top)); right:max(13px,env(safe-area-inset-right));
+            transform:scaleX(-1); }
+.frame .bl{ bottom:max(13px,env(safe-area-inset-bottom)); left:max(13px,env(safe-area-inset-left));
+            transform:scaleY(-1); }
+.frame .br{ bottom:max(13px,env(safe-area-inset-bottom)); right:max(13px,env(safe-area-inset-right));
+            transform:scale(-1,-1); }
+
 .motes{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
 .mote{
   position:absolute; border-radius:50%;
@@ -277,13 +301,19 @@ a{ text-decoration:none; color:inherit; }
   font-size:clamp(17px,5vw,27px); letter-spacing:.26em; text-indent:.26em;
 }
 
+.flo{ line-height:0; }
+.flo svg{ width:min(58vw,210px); height:auto; display:block;
+          filter:drop-shadow(0 0 10px rgba(201,162,39,.25)); }
 .rule{ display:flex; align-items:center; justify-content:center; gap:9px; width:min(62vw,230px); }
 .rule i{ height:1px; flex:1;
   background:linear-gradient(90deg,rgba(201,162,39,0),rgba(232,207,134,.85),rgba(201,162,39,0)); }
 .rule b{ width:5px; height:5px; background:var(--gold-l); transform:rotate(45deg); flex:0 0 auto; }
 
 /* ── ch1 hero: the arch ── */
-.stage{ position:relative; width:min(80vw,330px); aspect-ratio:290/400; }
+.stage{ position:relative; width:min(80vw,330px); aspect-ratio:290/400; perspective:900px; }
+/* separate layer for the pointer tilt, so it never fights the reveal transform */
+.tilt{ position:absolute; inset:0; transform-style:preserve-3d;
+       transition:transform .55s var(--ease); }
 .stage svg{ position:absolute; inset:0; width:100%; height:100%; }
 .stage .content{
   position:absolute; inset:0; display:flex; flex-direction:column;
@@ -317,11 +347,17 @@ a{ text-decoration:none; color:inherit; }
 /* ── ch4 countdown ── */
 .count{ display:flex; gap:clamp(8px,3.4vw,20px); justify-content:center; flex-wrap:nowrap; }
 .unit{
-  min-width:clamp(52px,17vw,76px); padding:12px 6px 9px;
-  border:1px solid rgba(201,162,39,.38); border-radius:4px;
-  background:linear-gradient(180deg,rgba(17,90,66,.42),rgba(4,35,26,.5));
-  backdrop-filter:blur(2px);
+  position:relative; min-width:clamp(52px,17vw,76px); padding:13px 7px 10px;
+  border:1px solid rgba(201,162,39,.34);
+  background:linear-gradient(180deg,rgba(17,90,66,.44),rgba(4,35,26,.52));
+  box-shadow:inset 0 1px 0 rgba(247,236,196,.16), 0 8px 24px rgba(0,0,0,.3);
 }
+.unit::before,.unit::after{
+  content:""; position:absolute; width:7px; height:7px;
+  border:1px solid rgba(232,207,134,.8);
+}
+.unit::before{ top:-1px; left:-1px; border-right:0; border-bottom:0; }
+.unit::after{ bottom:-1px; right:-1px; border-left:0; border-top:0; }
 .unit .n{
   display:block; font-family:'Cinzel',serif; font-size:clamp(19px,6.2vw,30px);
   color:#fffaf0; line-height:1; font-variant-numeric:tabular-nums;
@@ -368,12 +404,18 @@ a{ text-decoration:none; color:inherit; }
   opacity:0; transition:opacity .8s var(--ease) .9s;
 }
 body.ready .dots{ opacity:1; }
+.dots .rail{ position:absolute; left:50%; top:-15px; bottom:-15px; width:1px;
+  transform:translateX(-50%); background:rgba(232,207,134,.16); }
+.dots .fill{ position:absolute; left:50%; top:-15px; width:1px; height:0;
+  transform:translateX(-50%); transition:height .3s linear;
+  background:linear-gradient(180deg,rgba(247,236,196,.95),rgba(201,162,39,.35));
+  box-shadow:0 0 7px rgba(232,207,134,.5); }
 .dots button{
-  width:8px; height:8px; padding:0; border:1px solid rgba(232,207,134,.55);
+  position:relative; z-index:2; width:8px; height:8px; padding:0; border:1px solid rgba(232,207,134,.55);
   background:transparent; border-radius:50%; cursor:pointer;
   transition:all .45s var(--ease); -webkit-tap-highlight-color:transparent;
 }
-.dots button.on{ background:var(--gold-l); transform:scale(1.42);
+.dots button.on{ background:var(--gold-l); border-color:var(--gold-x); transform:scale(1.42);
   box-shadow:0 0 12px rgba(232,207,134,.75); }
 
 .cue{
@@ -403,7 +445,13 @@ body.ready .cue.show{ opacity:1; }
 <body>
 
 <div class="bg" aria-hidden="true">
-  <div class="girih"></div><div class="wash" id="wash"></div><div class="vig"></div>
+  <div class="girih"></div>
+  <svg class="med" viewBox="-206 -206 412 412" fill="none" stroke="#e8cf86" stroke-linejoin="round"><path d="M0.00,-200.00L141.42,141.42L-200.00,0.00L141.42,-141.42L0.00,200.00L-141.42,-141.42L200.00,0.00L-141.42,141.42Z" stroke-width="1.6"/><path d="M0.00,-160.00L113.14,113.14L-160.00,0.00L113.14,-113.14L0.00,160.00L-113.14,-113.14L160.00,0.00L-113.14,113.14Z" stroke-width="1.1"/><path d="M0.00,-120.00L84.85,84.85L-120.00,0.00L84.85,-84.85L0.00,120.00L-84.85,-84.85L120.00,0.00L-84.85,84.85Z" stroke-width="0.9"/><path d="M70.41,-169.99L169.99,-70.41L169.99,70.41L70.41,169.99L-70.41,169.99L-169.99,70.41L-169.99,-70.41L-70.41,-169.99Z" stroke-width=".8"/><path d="M53.58,-129.34L129.34,-53.58L129.34,53.58L53.58,129.34L-53.58,129.34L-129.34,53.58L-129.34,-53.58L-53.58,-129.34Z" stroke-width=".8"/><path d="M35.21,-85.00L85.00,-35.21L85.00,35.21L35.21,85.00L-35.21,85.00L-85.00,35.21L-85.00,-35.21L-35.21,-85.00Z" stroke-width=".8"/><circle r="60" stroke-width=".8"/><path d="M0.00,-44.00L31.11,31.11L-44.00,0.00L31.11,-31.11L0.00,44.00L-31.11,-31.11L44.00,0.00L-31.11,31.11Z" stroke-width="1"/></svg>
+  <div class="wash" id="wash"></div><div class="vig"></div>
+</div>
+<div class="frame" aria-hidden="true">
+  <span class="tl"><svg viewBox="0 0 56 56" fill="none" stroke="#e8cf86" stroke-linecap="round"><path d="M1,56 V20 A19 19 0 0 1 20,1 H56" stroke-width="1.15"/><path d="M9,56 V24 A15 15 0 0 1 24,9 H56" stroke-width=".5" opacity=".5"/><path d="M16.00,9.60L20.53,20.53L9.60,16.00L20.53,11.47L16.00,22.40L11.47,11.47L22.40,16.00L11.47,20.53Z" fill="#e8cf86" stroke="none" opacity=".8"/></svg></span><span class="tr"><svg viewBox="0 0 56 56" fill="none" stroke="#e8cf86" stroke-linecap="round"><path d="M1,56 V20 A19 19 0 0 1 20,1 H56" stroke-width="1.15"/><path d="M9,56 V24 A15 15 0 0 1 24,9 H56" stroke-width=".5" opacity=".5"/><path d="M16.00,9.60L20.53,20.53L9.60,16.00L20.53,11.47L16.00,22.40L11.47,11.47L22.40,16.00L11.47,20.53Z" fill="#e8cf86" stroke="none" opacity=".8"/></svg></span>
+  <span class="bl"><svg viewBox="0 0 56 56" fill="none" stroke="#e8cf86" stroke-linecap="round"><path d="M1,56 V20 A19 19 0 0 1 20,1 H56" stroke-width="1.15"/><path d="M9,56 V24 A15 15 0 0 1 24,9 H56" stroke-width=".5" opacity=".5"/><path d="M16.00,9.60L20.53,20.53L9.60,16.00L20.53,11.47L16.00,22.40L11.47,11.47L22.40,16.00L11.47,20.53Z" fill="#e8cf86" stroke="none" opacity=".8"/></svg></span><span class="br"><svg viewBox="0 0 56 56" fill="none" stroke="#e8cf86" stroke-linecap="round"><path d="M1,56 V20 A19 19 0 0 1 20,1 H56" stroke-width="1.15"/><path d="M9,56 V24 A15 15 0 0 1 24,9 H56" stroke-width=".5" opacity=".5"/><path d="M16.00,9.60L20.53,20.53L9.60,16.00L20.53,11.47L16.00,22.40L11.47,11.47L22.40,16.00L11.47,20.53Z" fill="#e8cf86" stroke="none" opacity=".8"/></svg></span>
 </div>
 <div class="motes" id="motes" aria-hidden="true"></div>
 
@@ -427,7 +475,7 @@ body.ready .cue.show{ opacity:1; }
   </div>
 </div>
 
-<nav class="dots" id="dots" aria-label="Sections"></nav>
+<nav class="dots" id="dots" aria-label="Sections"><span class="rail"></span><span class="fill" id="pfill"></span></nav>
 
 <div class="cue" id="cue">
   <span>Scroll</span>
@@ -444,6 +492,7 @@ body.ready .cue.show{ opacity:1; }
     <div class="bn rv" style="--d:.28s;font-size:clamp(11px,3.3vw,13px);margin-top:5px">বিবাহোত্তর  সংবর্ধনা</div>
 
     <div class="stage rv sc" style="--d:.34s;margin-top:clamp(6px,2vh,18px)">
+      <div class="tilt">
       <svg viewBox="0 0 290 400" fill="none" aria-hidden="true">
         <defs>
           <linearGradient id="gfoil" x1="0" y1="0" x2="1" y2="1">
@@ -481,6 +530,7 @@ body.ready .cue.show{ opacity:1; }
         <div class="nm">NIMISA</div>
         <div class="bn" style="font-size:clamp(10px,3.1vw,13px);margin-top:7%">সাদিকুল  ও  নিমিসা</div>
       </div>
+      </div>
     </div>
   </div></section>
 
@@ -488,7 +538,7 @@ body.ready .cue.show{ opacity:1; }
   <section class="ch" data-label="Qur'ān"><div class="inner">
     <svg class="rv sc" style="--d:.05s;width:clamp(42px,12vw,58px);margin-bottom:20px" viewBox="-34 -34 68 68" aria-hidden="true"><path d="M14.04,0.00L26.87,2.65L13.77,2.74" fill="#d9b449" opacity=".9"/><path d="M12.97,5.37L23.81,12.73L11.67,7.80" fill="#d9b449" opacity=".9"/><path d="M9.93,9.93L17.13,20.87L7.80,11.67" fill="#d9b449" opacity=".9"/><path d="M5.37,12.97L7.84,25.84L2.74,13.77" fill="#d9b449" opacity=".9"/><path d="M0.00,14.04L-2.65,26.87L-2.74,13.77" fill="#d9b449" opacity=".9"/><path d="M-5.37,12.97L-12.73,23.81L-7.80,11.67" fill="#d9b449" opacity=".9"/><path d="M-9.93,9.93L-20.87,17.13L-11.67,7.80" fill="#d9b449" opacity=".9"/><path d="M-12.97,5.37L-25.84,7.84L-13.77,2.74" fill="#d9b449" opacity=".9"/><path d="M-14.04,0.00L-26.87,-2.65L-13.77,-2.74" fill="#d9b449" opacity=".9"/><path d="M-12.97,-5.37L-23.81,-12.73L-11.67,-7.80" fill="#d9b449" opacity=".9"/><path d="M-9.93,-9.93L-17.13,-20.87L-7.80,-11.67" fill="#d9b449" opacity=".9"/><path d="M-5.37,-12.97L-7.84,-25.84L-2.74,-13.77" fill="#d9b449" opacity=".9"/><path d="M-0.00,-14.04L2.65,-26.87L2.74,-13.77" fill="#d9b449" opacity=".9"/><path d="M5.37,-12.97L12.73,-23.81L7.80,-11.67" fill="#d9b449" opacity=".9"/><path d="M9.93,-9.93L20.87,-17.13L11.67,-7.80" fill="#d9b449" opacity=".9"/><path d="M12.97,-5.37L25.84,-7.84L13.77,-2.74" fill="#d9b449" opacity=".9"/><circle cx="0" cy="0" r="14.04" fill="#0a3b2b" stroke="#f6e7b4" stroke-width="1"/><path d="M0.00,-10.39L7.35,7.35L-10.39,0.00L7.35,-7.35L0.00,10.39L-7.35,-7.35L10.39,0.00L-7.35,7.35Z" fill="none" stroke="#f6e7b4" stroke-width=".85" opacity=".95"/><circle cx="0" cy="0" r="2.39" fill="#f6e7b4"/></svg>
     <div class="ar rv" style="--d:.14s;font-size:clamp(15px,4.6vw,21px);max-width:30ch">وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً</div>
-    <div class="rule rv" style="--d:.26s;margin:20px 0 18px"><i></i><b></b><i></i></div>
+    <div class="flo rv sc" style="--d:.26s;margin:10px 0 8px"><svg viewBox="-95.0 -24 190 48" width="190" height="48" fill="none" overflow="visible"><g stroke="#d9b449" stroke-width="1.25" stroke-linecap="round"><g transform="translate(-6,0)"><path d="M0,0 C14,-1.5 24,-7 31,-15 C36,-21 44,-21 46,-14 C48,-7 41,-2 35,-5 C31,-7 31,-12 35,-13" transform="scale(-1,1)"/></g><g transform="translate(6,0)"><path d="M0,0 C14,-1.5 24,-7 31,-15 C36,-21 44,-21 46,-14 C48,-7 41,-2 35,-5 C31,-7 31,-12 35,-13"/></g><path d="M-89.0,0 L-46,0" opacity=".65"/><path d="M46,0 L89.0,0" opacity=".65"/></g><g fill="#d9b449" opacity=".92"><g transform="translate(-10,6) rotate(200)"><path d="M0,0 C7,-5 16,-6 22,-2 C16,3 7,4 0,0 Z"/></g><g transform="translate(10,6) rotate(-20)"><path d="M0,0 C7,-5 16,-6 22,-2 C16,3 7,4 0,0 Z"/></g></g><path d="M0.00,-8.50L1.30,-3.14L6.01,-6.01L3.14,-1.30L8.50,0.00L3.14,1.30L6.01,6.01L1.30,3.14L0.00,8.50L-1.30,3.14L-6.01,6.01L-3.14,1.30L-8.50,0.00L-3.14,-1.30L-6.01,-6.01L-1.30,-3.14Z" fill="#f6e7b4"/><path d="M0.00,-3.60L0.57,-1.39L2.55,-2.55L1.39,-0.57L3.60,0.00L1.39,0.57L2.55,2.55L0.57,1.39L0.00,3.60L-0.57,1.39L-2.55,2.55L-1.39,0.57L-3.60,0.00L-1.39,-0.57L-2.55,-2.55L-0.57,-1.39Z" fill="#083426"/></svg></div>
     <div class="en rv" style="--d:.34s;font-style:italic;font-size:clamp(14px,4vw,18px);max-width:34ch">“And among His signs is this, that He created for you mates from among yourselves, that you may find tranquillity in them; and He has placed between you affection and mercy.”</div>
     <div class="eyebrow rv" style="--d:.44s;margin-top:16px">Sūrah Ar-Rūm · 30 : 21</div>
   </div></section>
@@ -548,7 +598,7 @@ body.ready .cue.show{ opacity:1; }
   <!-- 6 · the du'a -->
   <section class="ch" data-label="Blessing"><div class="inner">
     <div class="ar rv" style="--d:.05s;font-size:clamp(16px,5vw,23px);max-width:26ch">بَارَكَ ٱللّٰهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ</div>
-    <div class="rule rv" style="--d:.18s;margin:20px 0 18px"><i></i><b></b><i></i></div>
+    <div class="flo rv sc" style="--d:.18s;margin:10px 0 8px"><svg viewBox="-95.0 -24 190 48" width="190" height="48" fill="none" overflow="visible"><g stroke="#d9b449" stroke-width="1.25" stroke-linecap="round"><g transform="translate(-6,0)"><path d="M0,0 C14,-1.5 24,-7 31,-15 C36,-21 44,-21 46,-14 C48,-7 41,-2 35,-5 C31,-7 31,-12 35,-13" transform="scale(-1,1)"/></g><g transform="translate(6,0)"><path d="M0,0 C14,-1.5 24,-7 31,-15 C36,-21 44,-21 46,-14 C48,-7 41,-2 35,-5 C31,-7 31,-12 35,-13"/></g><path d="M-89.0,0 L-46,0" opacity=".65"/><path d="M46,0 L89.0,0" opacity=".65"/></g><g fill="#d9b449" opacity=".92"><g transform="translate(-10,6) rotate(200)"><path d="M0,0 C7,-5 16,-6 22,-2 C16,3 7,4 0,0 Z"/></g><g transform="translate(10,6) rotate(-20)"><path d="M0,0 C7,-5 16,-6 22,-2 C16,3 7,4 0,0 Z"/></g></g><path d="M0.00,-8.50L1.30,-3.14L6.01,-6.01L3.14,-1.30L8.50,0.00L3.14,1.30L6.01,6.01L1.30,3.14L0.00,8.50L-1.30,3.14L-6.01,6.01L-3.14,1.30L-8.50,0.00L-3.14,-1.30L-6.01,-6.01L-1.30,-3.14Z" fill="#f6e7b4"/><path d="M0.00,-3.60L0.57,-1.39L2.55,-2.55L1.39,-0.57L3.60,0.00L1.39,0.57L2.55,2.55L0.57,1.39L0.00,3.60L-0.57,1.39L-2.55,2.55L-1.39,0.57L-3.60,0.00L-1.39,-0.57L-2.55,-2.55L-0.57,-1.39Z" fill="#083426"/></svg></div>
     <div class="en rv" style="--d:.26s;font-style:italic;font-size:clamp(14px,4vw,18px);max-width:32ch">“May Allah bless you both, and shower His blessings upon you, and unite you together in goodness.”</div>
     <div class="en rv" style="--d:.36s;margin-top:26px;font-size:clamp(14px,4.2vw,18px)">Your presence and duʻās will complete our joy.</div>
     <div class="bn rv" style="--d:.42s;font-size:clamp(12px,3.6vw,15px);margin-top:8px;max-width:28ch">আপনাদের দোয়া ও উপস্থিতিই আমাদের আনন্দ পূর্ণ করবে।</div>
@@ -651,6 +701,28 @@ body.ready .cue.show{ opacity:1; }
     }, { passive:true });
   }
 
+  /* ── progress rail through the dots ───────────────────────── */
+  var pfill = $("#pfill");
+  function progress(){
+    var max = scroller.scrollHeight - scroller.clientHeight;
+    var p = max > 0 ? scroller.scrollTop / max : 0;
+    pfill.style.height = (p * (dotWrap.clientHeight + 30)).toFixed(1) + "px";
+  }
+  scroller.addEventListener("scroll", progress, { passive:true });
+  progress();
+
+  /* ── the arch leans toward the pointer (fine pointers only) ── */
+  if (!RM && matchMedia("(pointer:fine)").matches){
+    var tilt = $(".tilt");
+    if (tilt) addEventListener("pointermove", function(e){
+      var x = (e.clientX / innerWidth  - .5);
+      var y = (e.clientY / innerHeight - .5);
+      tilt.style.transform = "translate(" + (x*12).toFixed(1) + "px," +
+                             (y*8).toFixed(1) + "px) rotateX(" + (-y*2.6).toFixed(2) +
+                             "deg) rotateY(" + (x*3.2).toFixed(2) + "deg)";
+    }, { passive:true });
+  }
+
   /* ── keyboard ─────────────────────────────────────────────── */
   addEventListener("keydown", function(e){
     if (!document.body.classList.contains("ready")){
@@ -694,7 +766,7 @@ body.ready .cue.show{ opacity:1; }
       "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//walima//invitation//EN","CALSCALE:GREGORIAN",
       "BEGIN:VEVENT",
       "UID:walima-20261013-sadikul-nimisa@invitation",
-      "DTSTAMP:20261005T124458Z",
+      "DTSTAMP:20261005T125935Z",
       "DTSTART:20261013T073000Z",
       "DTEND:20261013T113000Z",
       "SUMMARY:Sadikul & Nimisa — Walima Reception",
